@@ -44,6 +44,7 @@ echo 'source "$HOME/.config/git/.git-completion.bash"' >> ~/.bashrc
 echo 'source "$HOME/.config/git/.git-prompt.sh"' >> ~/.bashrc
 echo 'export GIT_PS1_SHOWDIRTYSTATE=1' >> ~/.bashrc
 echo "export PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[01;33m\]\$(__git_ps1)\[\033[01;34m\] \$\[\033[00m\] '" >> ~/.bashrc
+git config --global init.defaultBranch main
 
 # Environment Modules
 sudo apt-get -y environment-modules
