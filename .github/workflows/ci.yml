@@ -1,0 +1,16 @@
+name: rel-CASPT2-CI-test
+
+on:
+  push:
+
+defaults:
+  run:
+    shell: bash
+jobs:
+  test-linux:
+    timeout-minutes: 60 # Max execution time (min)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup
+        run: ./setup
