@@ -7,8 +7,10 @@ sudo apt-get update && sudo apt-get -y full-upgrade
 
 # mozc
 sudo apt-get install -y ibus-mozc
+set +e
 ibus restart
 gsettings set org.gnome.desktop.input-sources sources "[('ibus', 'mozc-jp')]"
+set -e
 
 # git
 sudo apt-get install -y git
