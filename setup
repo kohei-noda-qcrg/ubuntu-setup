@@ -6,7 +6,7 @@ sudo apt-get update && sudo apt-get -y full-upgrade
 # mozc
 sudo apt-get install -y ibus-mozc
 ibus restart
-gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'jp'), ('ibus', 'mozc-jp')]"
+gsettings set org.gnome.desktop.input-sources sources "[('ibus', 'mozc-jp')]"
 
 # git
 sudo apt-get install -y git
@@ -14,6 +14,10 @@ sudo apt-get install -y git
 # pyenv
 sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+. ~/.bashrc
 python3_ver="3.9.15"
 python2_ver="2.7.18"
 pyenv install $python3_ver
@@ -27,9 +31,10 @@ pip install fortls fprettify pytest black flake8
 git clone https://github.com/nodenv/nodenv.git ~/.nodenv
 echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.bashrc
 exec $SHELL
+~/.nodenv/bin/nodenv init
 mkdir -p "$(nodenv root)"/plugins
 git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
-nodenv install 17.8.0
+nodenv install "16.16.0"
 
 # neovim
 sudo apt-get install -y neovim
@@ -40,12 +45,12 @@ cp ~/dotfiles/nvim/init.vim ~/.config/nvim/init.vim
 # git settings
 mkdir -p ~/.config/git
 cp ~/dotfiles/git/* ~/.config/git
-echo 'source "$HOME/.config/git/.git-completion.bash"' >> ~/.bashrc
-echo 'source "$HOME/.config/git/.git-prompt.sh"' >> ~/.bashrc
+echo 'source "$HOME/.config/git/git-completion.bash"' >> ~/.bashrc
+echo 'source "$HOME/.config/git/git-prompt.sh"' >> ~/.bashrc
 echo 'export GIT_PS1_SHOWDIRTYSTATE=1' >> ~/.bashrc
 echo "export PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[01;33m\]\$(__git_ps1)\[\033[01;34m\] \$\[\033[00m\] '" >> ~/.bashrc
 git config --global init.defaultBranch main
 
 # Environment Modules
 sudo apt-get -y environment-modules
-# TODO: Link modules setup script to /etc/profile.d/modules.sh
+echo ". /usr/share/modules/init/bash" >> ~/.bashrc
