@@ -37,7 +37,9 @@ pip install fortls fprettify pytest black flake8
 git clone https://github.com/nodenv/nodenv.git ~/.nodenv
 echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(nodenv init -)"' >> ~/.bashrc
+set +e
 eval "$(~/.nodenv/bin/nodenv init -)"
+set -e
 mkdir -p "$(nodenv root)"/plugins
 git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
 node_version="16.16.0"
