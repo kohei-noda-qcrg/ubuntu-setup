@@ -13,4 +13,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup
-        run: ./setup && source ~/.bashrc && ./python_and_node
+        run: ./setup
