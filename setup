@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eux
+
 # Upgrade to latest
 sudo apt-get update && sudo apt-get -y full-upgrade
 
@@ -17,7 +19,7 @@ git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
 echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-. ~/.bashrc
+~/.pyenv/bin/pyenv init -
 python3_ver="3.9.15"
 python2_ver="2.7.18"
 pyenv install $python3_ver
@@ -30,11 +32,13 @@ pip install fortls fprettify pytest black flake8
 # nodenv
 git clone https://github.com/nodenv/nodenv.git ~/.nodenv
 echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.bashrc
-exec $SHELL
-~/.nodenv/bin/nodenv init
+echo 'eval "$(nodenv init -)"' >> ~/.bashrc
+~/.nodenv/bin/nodenv init -
 mkdir -p "$(nodenv root)"/plugins
 git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
-nodenv install "16.16.0"
+node_version="16.16.0"
+nodenv install $node_version
+nodenv global $node_version
 
 # neovim
 sudo apt-get install -y neovim
@@ -52,7 +56,7 @@ echo "export PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[01;33m\]\$(__git_
 git config --global init.defaultBranch main
 
 # Environment Modules
-sudo apt-get -y environment-modules
+sudo apt-get install -y environment-modules
 echo ". /usr/share/modules/init/bash" >> ~/.bashrc
 
 wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
