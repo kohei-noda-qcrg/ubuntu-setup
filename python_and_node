@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -eux
+
+python3_ver="3.9.15"
+python2_ver="2.7.18"
+pyenv install $python3_ver
+pyenv install $python2_ver
+pyenv global $python3_ver $python2_ver
+
+mkdir -p "$(nodenv root)"/plugins
+git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
+node_ver="16.16.0"
+nodenv install $node_ver
+nodenv global $node_ver
+

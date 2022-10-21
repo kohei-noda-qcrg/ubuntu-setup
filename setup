@@ -21,14 +21,6 @@ git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
 echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-set +e
-eval "$(~/.pyenv/bin/pyenv init -)" 
-set -e
-python3_ver="3.9.15"
-python2_ver="2.7.18"
-pyenv install $python3_ver
-pyenv install $python2_ver
-pyenv global $python3_ver $python2_ver
 
 # pip
 pip install fortls fprettify pytest black flake8
@@ -37,14 +29,6 @@ pip install fortls fprettify pytest black flake8
 git clone https://github.com/nodenv/nodenv.git ~/.nodenv
 echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(nodenv init -)"' >> ~/.bashrc
-set +e
-eval "$(~/.nodenv/bin/nodenv init -)"
-set -e
-mkdir -p "$(nodenv root)"/plugins
-git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
-node_version="16.16.0"
-nodenv install $node_version
-nodenv global $node_version
 
 # neovim
 sudo apt-get install -y neovim
