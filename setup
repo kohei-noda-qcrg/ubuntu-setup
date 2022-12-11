@@ -55,7 +55,7 @@ function common(){
 	# git settings
 	if [ ! -f $PWD/checkpoint/git ]; then
 		mkdir -p ~/.config/git
-		cp ~/dotfiles/git/* ~/.config/git
+		cp  $PWD/dotfiles/git/* ~/.config/git
 		git config --global init.defaultBranch main
 		git config --global core.editor "nvim"
 		git config --global alias.a add
