@@ -1,86 +1,176 @@
 #!/usr/bin/env bash
 
-set -eux
+set -euo pipefail
 
-# Upgrade to latest
-sudo apt-get update && sudo apt-get -y full-upgrade
+function common(){
+	# Upgrade to latest
+	sudo apt-get update && sudo apt-get -y full-upgrade
 
-# mozc
-sudo apt-get install -y ibus-mozc
-set +e
-ibus restart
-gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('ibus', 'mozc-jp')]"
-set -e
+	# git
+	sudo apt-get install -y git
 
-# git
-sudo apt-get install -y git
+	# pyenv
+	sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+	if [ ! -d ~/.pyenv ]; then
+		git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+		export PATH="$HOME/.pyenv/bin:$HOME/.nodenv/bin:$PATH"
+		set +e
+		eval "$(pyenv init -)"
+		set -e
+		python3_ver="3.9.15"
+		python2_ver="2.7.18"
+		pyenv install $python3_ver
+		pyenv install $python2_ver
+		pyenv global $python3_ver $python2_ver
+		echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+		echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+		echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+  	fi
+	# pip
+	pip install fortls fprettify pytest black flake8 numpy scipy matplotlib pandas jupyterlab
 
-# pyenv
-sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-HOMEPATH=~
-export PATH="$HOMEPATH/.pyenv/bin:$HOMEPATH/.nodenv/bin:$PATH"
-set +e
-eval "$(pyenv init -)"
-set -e
-python3_ver="3.9.15"
-python2_ver="2.7.18"
-pyenv install $python3_ver
-pyenv install $python2_ver
-pyenv global $python3_ver $python2_ver
+	# nodenv
+	if [ ! -d ~/.nodenv ]; then
+		git clone https://github.com/nodenv/nodenv.git ~/.nodenv
+		export PATH="$HOME/.pyenv/bin:$HOME/.nodenv/bin:$PATH"
+		set +e
+		eval "$(nodenv init -)"
+		set -e
+		mkdir -p "$(nodenv root)"/plugins
+		git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
+		node_ver="16.16.0"
+		nodenv install $node_ver
+		nodenv global $node_ver
+		echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.bashrc
+		echo 'eval "$(nodenv init -)"' >> ~/.bashrc
+	fi
+	# neovim
+	sudo apt-get install -y neovim
+	if [ ! -d $PWD/dotfiles ]; then
+		git clone https://github.com/kohei-noda-qcrg/dotfiles.git $PWD/dotfiles
+		mkdir -p ~/.config/nvim
+		cp $PWD/dotfiles/nvim/init.vim ~/.config/nvim/init.vim
+	fi
 
-# pip
-pip install fortls fprettify pytest black flake8
+	# git settings
+	if [ ! -f $PWD/checkpoint/git ]; then
+		mkdir -p ~/.config/git
+		cp ~/dotfiles/git/* ~/.config/git
+		git config --global init.defaultBranch main
+		git config --global core.editor "nvim"
+		git config --global alias.a add
+		git config --global alias.br branch
+		git config --global alias.ch checkout
+		git config --global alias.co commit
+		git config --global alias.st status
+		git config --global alias.unstage 'reset HEAD --'
+		echo 'source "$HOME/.config/git/git-prompt.sh"' >> ~/.bashrc
+		echo 'export GIT_PS1_SHOWDIRTYSTATE=1' >> ~/.bashrc
+		echo "export PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[01;33m\]\$(__git_ps1)\[\033[01;34m\] \$\[\033[00m\] '" >> ~/.bashrc
+		touch $PWD/checkpoint/git
+	fi
 
-# nodenv
-git clone https://github.com/nodenv/nodenv.git ~/.nodenv
-echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.bashrc
-echo 'eval "$(nodenv init -)"' >> ~/.bashrc
-set +e
-eval "$(nodenv init -)"
-set -e
-mkdir -p "$(nodenv root)"/plugins
-git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
-node_ver="16.16.0"
-nodenv install $node_ver
-nodenv global $node_ver
+	# Install docker
+	sudo apt-get update
+	sudo apt-get install -y \
+		apt-transport-https \
+		ca-certificates \
+		curl \
+		gnupg-agent \
+		software-properties-common
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	sudo add-apt-repository -y \
+		"deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+		$(lsb_release -cs) \
+		stable"
+	sudo apt-get update
+	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+	sudo usermod -aG docker $USER
 
-# neovim
-sudo apt-get install -y neovim
-git clone https://github.com/kohei-noda-qcrg/dotfiles.git ~/dotfiles
-mkdir -p ~/.config/nvim
-cp ~/dotfiles/nvim/init.vim ~/.config/nvim/init.vim
+}
 
-# git settings
-mkdir -p ~/.config/git
-cp ~/dotfiles/git/* ~/.config/git
-echo 'source "$HOME/.config/git/git-completion.bash"' >> ~/.bashrc
-echo 'source "$HOME/.config/git/git-prompt.sh"' >> ~/.bashrc
-echo 'export GIT_PS1_SHOWDIRTYSTATE=1' >> ~/.bashrc
-echo "export PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[01;33m\]\$(__git_ps1)\[\033[01;34m\] \$\[\033[00m\] '" >> ~/.bashrc
-git config --global init.defaultBranch main
+function wsl(){
 
-# Environment Modules
-sudo apt-get install -y environment-modules
-echo ". /usr/share/modules/init/bash" >> ~/.bashrc
+	# Add /etc/sudoers entry
+	echo "docker ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
 
-wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
-sudo apt-get update
-sudo apt-get install -y intel-oneapi-compiler-fortran intel-oneapi-openmp intel-oneapi-mpi intel-oneapi-mpi-devel intel-oneapi-mkl
-sudo /opt/intel/oneapi/modulefiles-setup.sh 
-echo 'module use "/opt/intel/oneapi/modulefiles"' >> ~/.bashrc
+	# Install mysql
+	sudo apt-get install -y mysql-server
 
-# Docker
-sudo apt install apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository --yes "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-sudo apt update
-sudo apt install -y docker-ce
-sudo usermod -aG docker ${USER}
+	# Add /etc/sudoers entry
+	echo "mysql ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
+	
+	if [ ! -f $PWD/checkpoint/wsl ]; then
+		echo "sudo service docker start" >> $HOME/.bashrc
+		echo "sudo service mysql start" >> $HOME/.bashrc
+		touch $PWD/checkpoint/wsl
+	fi
+}
+
+function linux(){	
+	# mozc
+	sudo apt-get install -y ibus-mozc
+	set +e
+	ibus restart
+	gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('ibus', 'mozc-jp')]"
+	set -e
+}
+
+function hpc(){
+	# Environment Modules
+	sudo apt-get install -y environment-modules
+	if [ ! -f $PWD/checkpoint/hpc ]; then
+		echo ". /usr/share/modules/init/bash" >> ~/.bashrc
+		echo 'module use "/opt/intel/oneapi/modulefiles"' >> ~/.bashrc
+		touch $PWD/checkpoint/hpc
+	fi
+	if [ ! -f $PWD/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB ]; then
+		wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+	fi
+	sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+	echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+	sudo apt-get update
+	sudo apt-get install -y intel-oneapi-compiler-fortran intel-oneapi-openmp intel-oneapi-mpi intel-oneapi-mpi-devel intel-oneapi-mkl
+	sudo /opt/intel/oneapi/modulefiles-setup.sh --force
+}
+
+while [[ $# -gt 0 ]]; do
+	key="$1"
+	case $key in
+		--wsl)
+			WSL=true
+			shift
+			;;
+		--hpc)
+			HPC=true
+			shift
+			;;
+		--help|-h)
+			echo "Usage: $0 [options]"
+			echo "Options:"
+			echo "  --wsl: Install for WSL"
+			echo "  --hpc: Install HPC tools (Environment Modules, Intel oneAPI)"
+			echo "  --help | -h: Show this help"
+			exit 0
+			;;
+		*)
+			echo "Unknown option: $key"
+			exit 1
+			;;
+	esac
+done
+
+# Main process
+PWD=$(cd $(dirname $0); pwd)
+mkdir -p $PWD/checkpoint
+common
+if [ -n "${WSL:-}" ]; then
+	wsl
+else
+	linux
+fi
+if [ -n "${HPC:-}" ]; then
+	hpc
+fi
 
 echo "Finish setup script successfully. Reboot your machine to apply settings." 
