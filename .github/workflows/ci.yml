@@ -10,7 +10,7 @@ jobs:
   test-linux:
     strategy:
       matrix:
-        options: ["", "-wsl", "--hpc", "--wsl --hpc", "--help"]
+        options: ["", "--wsl", "--hpc", "--wsl --hpc", "--help"]
     timeout-minutes: 60 # Max execution time (min)
     runs-on: ubuntu-latest
     steps:
