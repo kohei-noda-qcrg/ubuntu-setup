@@ -92,13 +92,13 @@ function common(){
 function wsl(){
 
 	# Add /etc/sudoers entry
-	echo "docker ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
+	echo "%docker ALL=(ALL)  NOPASSWD: /usr/sbin/service docker start" | sudo tee -a /etc/sudoers
 
 	# Install mysql
 	sudo apt-get install -y mysql-server
 
 	# Add /etc/sudoers entry
-	echo "mysql ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers
+	echo "%sudo ALL=NOPASSWD: /etc/init.d/mysql" | sudo tee -a /etc/sudoers
 	
 	if [ ! -f $PWD/checkpoint/wsl ]; then
 		echo "sudo service docker start" >> $HOME/.bashrc
