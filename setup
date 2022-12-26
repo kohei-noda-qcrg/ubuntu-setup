@@ -109,11 +109,7 @@ function wsl(){
 
 function linux(){	
 	# mozc
-	sudo apt-get install -y ibus-mozc
-	set +e
-	ibus restart
-	gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('ibus', 'mozc-jp')]"
-	set -e
+	sudo apt-get install -y fcitx-mozc
 }
 
 function hpc(){
