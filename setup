@@ -86,7 +86,11 @@ function common(){
 	sudo apt-get update
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 	sudo usermod -aG docker $USER
-
+	
+	# Install fzf
+        git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+	yes | ~/.fzf/install
+	echo "export FZF_DEFAULT_OPTS='--height 80% --layout=reverse --border'" >> ~/.bashrc
 }
 
 function wsl(){
