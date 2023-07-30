@@ -102,7 +102,7 @@ function wsl(){
 	sudo apt-get install -y mysql-server
 
 	# Add /etc/sudoers entry
-	echo "%sudo ALL=NOPASSWD: /etc/init.d/mysql" | sudo tee -a /etc/sudoers
+	echo "%sudo ALL=NOPASSWD: /usr/sbin/service mysql start" | sudo tee -a /etc/sudoers
 	
 	if [ ! -f $PWD/checkpoint/wsl ]; then
 		echo "sudo service docker start" >> $HOME/.bashrc
