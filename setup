@@ -128,7 +128,7 @@ function hpc(){
 	sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 	echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
 	sudo apt-get update
-	sudo apt-get install -y intel-oneapi-compiler-fortran intel-oneapi-openmp intel-oneapi-mpi intel-oneapi-mpi-devel intel-oneapi-mkl
+	sudo apt-get install -y intel-oneapi-compiler-fortran intel-oneapi-openmp intel-oneapi-mpi intel-oneapi-mpi-devel intel-oneapi-mkl intel-oneapi-compiler-dpcpp-cpp-andcpp-classic
 	sudo /opt/intel/oneapi/modulefiles-setup.sh --force
 }
 
