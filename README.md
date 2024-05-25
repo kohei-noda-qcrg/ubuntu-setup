@@ -1,6 +1,6 @@
 # ubuntu-setup
 
-- This script is a setup script for users using Ubuntu and bash
+- This script is a Ubuntu setup script for my own.
 
 ## how to use
 

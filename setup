@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-function common(){
+function common() {
 	# Upgrade to latest
 	sudo apt-get update && sudo apt-get -y full-upgrade
 
@@ -16,37 +16,32 @@ function common(){
 	sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 	if [ ! -d ~/.pyenv ]; then
 		git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-		export PATH="$HOME/.pyenv/bin:$HOME/.nodenv/bin:$PATH"
+		export PATH="$HOME/.pyenv/bin:$PATH"
 		set +e
 		eval "$(pyenv init -)"
 		set -e
-		python3_ver="3.9.15"
+		python3_ver="3.11.4"
 		python2_ver="2.7.18"
 		pyenv install $python3_ver
 		pyenv install $python2_ver
 		pyenv global $python3_ver $python2_ver
-		echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-		echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-		echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-  	fi
-	# pip
-	pip install fortls fprettify pytest black flake8 numpy scipy matplotlib pandas jupyterlab
-
-	# nodenv
-	if [ ! -d ~/.nodenv ]; then
-		git clone https://github.com/nodenv/nodenv.git ~/.nodenv
-		export PATH="$HOME/.pyenv/bin:$HOME/.nodenv/bin:$PATH"
-		set +e
-		eval "$(nodenv init -)"
-		set -e
-		mkdir -p "$(nodenv root)"/plugins
-		git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
-		node_ver="16.16.0"
-		nodenv install $node_ver
-		nodenv global $node_ver
-		echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.bashrc
-		echo 'eval "$(nodenv init -)"' >> ~/.bashrc
+		echo 'export PYENV_ROOT="$HOME/.pyenv"' >>~/.bashrc
+		echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >>~/.bashrc
+		echo 'eval "$(pyenv init -)"' >>~/.bashrc
 	fi
+	# pip
+	pip install pytest black flake8 numpy scipy matplotlib pandas jupyterlab
+
+	# volta
+	if [ ! -d ~/.volta ]; then
+		curl https://get.volta.sh | bash
+		echo 'export VOLTA_HOME="$HOME/.volta:$PATH"' >>~/.bashrc
+		echo 'export PATH="$VOLTA_HOME/bin:$PATH"' >>~/.bashrc
+		export VOLTA_HOME="$HOME/.volta"
+		export PATH="$VOLTA_HOME/bin:$PATH"
+		volta install node
+	fi
+
 	# neovim
 	sudo apt-get install -y neovim
 	if [ ! -d $PWD/dotfiles ]; then
@@ -58,7 +53,7 @@ function common(){
 	# git settings
 	if [ ! -f $PWD/checkpoint/git ]; then
 		mkdir -p ~/.config/git
-		cp  $PWD/dotfiles/git/* ~/.config/git
+		cp $PWD/dotfiles/git/* ~/.config/git
 		git config --global init.defaultBranch main
 		git config --global core.editor "nvim"
 		git config --global alias.a add
@@ -68,9 +63,9 @@ function common(){
 		git config --global alias.st status
 		git config --global alias.unstage 'reset HEAD --'
 		git config --global rebase.autostash true
-		echo 'source "$HOME/.config/git/git-prompt.sh"' >> ~/.bashrc
-		echo 'export GIT_PS1_SHOWDIRTYSTATE=1' >> ~/.bashrc
-		echo "export PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[01;33m\]\$(__git_ps1)\[\033[01;34m\] \$\[\033[00m\] '" >> ~/.bashrc
+		echo 'source "$HOME/.config/git/git-prompt.sh"' >>~/.bashrc
+		echo 'export GIT_PS1_SHOWDIRTYSTATE=1' >>~/.bashrc
+		echo "export PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[01;33m\]\$(__git_ps1)\[\033[01;34m\] \$\[\033[00m\] '" >>~/.bashrc
 		touch $PWD/checkpoint/git
 	fi
 
@@ -90,40 +85,55 @@ function common(){
 	sudo apt-get update
 	sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 	sudo usermod -aG docker $USER
-	
+
 	# Install fzf
-        # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && yes | ~/.fzf/install && echo "export FZF_DEFAULT_OPTS='--height 80% --layout=reverse --border'" >> ~/.bashrc
+	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install --all && echo "export FZF_DEFAULT_OPTS='--height 80% --layout=reverse --border'" >>~/.bashrc
+
+	# Install mysql
+	sudo apt-get install -y mysql-server
 }
 
-function wsl(){
+function wsl() {
 
 	# Add /etc/sudoers entry
 	echo "%docker ALL=(ALL)  NOPASSWD: /usr/sbin/service docker start" | sudo tee -a /etc/sudoers
 
-	# Install mysql
-	sudo apt-get install -y mysql-server
-
 	# Add /etc/sudoers entry
 	echo "%sudo ALL=NOPASSWD: /usr/sbin/service mysql start" | sudo tee -a /etc/sudoers
-	
+
 	if [ ! -f $PWD/checkpoint/wsl ]; then
-		echo "sudo service docker start" >> $HOME/.bashrc
-		echo "sudo service mysql start" >> $HOME/.bashrc
+		echo "sudo service docker start" >>$HOME/.bashrc
+		echo "sudo service mysql start" >>$HOME/.bashrc
 		touch $PWD/checkpoint/wsl
 	fi
 }
 
-function linux(){	
+function linux() {
 	# mozc
 	sudo apt-get install -y fcitx-mozc
+
+	# Install rust by using rustup
+	if [ ! -d ~/.cargo ]; then
+		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+		echo '. "$HOME/.cargo/env"' >>~/.bashrc
+		source $HOME/.cargo/env
+	fi
+
+	# Install VSCode (https://code.visualstudio.com/docs/setup/linux#_debian-and-ubuntu-based-distributions)
+	sudo apt-get install wget gpg apt-transport-https -y
+	wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >packages.microsoft.gpg
+	sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+	echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list >/dev/null
+	rm -f packages.microsoft.gpg
+	sudo apt-get update && sudo apt-get install code -y
 }
 
-function hpc(){
+function hpc() {
 	# Environment Modules
 	sudo apt-get install -y environment-modules
 	if [ ! -f $PWD/checkpoint/hpc ]; then
-		echo ". /usr/share/modules/init/bash" >> ~/.bashrc
-		echo 'module use "/opt/intel/oneapi/modulefiles"' >> ~/.bashrc
+		echo ". /usr/share/modules/init/bash" >>~/.bashrc
+		echo 'module use "/opt/intel/oneapi/modulefiles"' >>~/.bashrc
 		touch $PWD/checkpoint/hpc
 	fi
 	if [ ! -f $PWD/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB ]; then
@@ -136,34 +146,85 @@ function hpc(){
 	sudo /opt/intel/oneapi/modulefiles-setup.sh --force
 }
 
+function vscode_install_extensions() {
+	##############################
+	# Install VScode extensions
+	##############################
+
+	# WSL and Remote-ssh and Remote-containers support
+	code --install-extension ms-vscode-remote.vscode-remote-extensionpack --force
+
+	# Utils
+	code --install-extension formulahendry.code-runner --force             # Execute script extension
+	code --install-extension streetsidesoftware.code-spell-checker --force # check English Spell
+	code --install-extension timonwong.shellcheck --force                  # Powerful support for syntax error of shell scripts
+	code --install-extension mads-hartmann.bash-ide-vscode --force         # Powerful support for bash script
+	code --install-extension usernamehw.errorlens --force                  # Whether or not you hover over the error line, highlight errors
+	code --install-extension PKief.material-icon-theme --force             # Change Vscode explorer icons
+	code --install-extension IBM.output-colorizer --force                  # Colorize output file
+	code --install-extension shardulm94.trailing-spaces --force            # Detect end of line spaces and highlight these
+	code --install-extension mosapride.zenkaku --force                     # Detect Zenkaku characters and highlight these
+	code --install-extension sgryjp.japanese-word-handler --force          # Japanese word jump extension
+	code --install-extension ms-vscode.hexeditor --force                   # Binary viewer
+	code --install-extension EditorConfig.EditorConfig --force             # Force code rules
+
+	# C/C++
+	code --install-extension ms-vscode.cpptools-extension-pack --force
+
+	# Rust
+	code --install-extension rust-lang.rust-analyzer --force  # Rust language support
+	code --install-extension tamasfe.even-better-toml --force # TOML language support
+
+	# Git
+	code --install-extension mhutchie.git-graph --force      # View git history as a graphical tree
+	code --install-extension donjayamanne.githistory --force # Add convenient features to Vscode Source control tab
+	code --install-extension eamodio.gitlens --force         # Visualize code authorship and so on
+
+	# GitHub
+	code --install-extension GitHub.vscode-pull-request-github --force # Pull request and issues support for Github
+	code --install-extension GitHub.copilot --force                    # AI code completion
+
+	# Markdown
+	code --install-extension yzane.markdown-pdf --force             # Convert Markdown to pdf
+	code --install-extension DavidAnson.vscode-markdownlint --force # Markdown linter
+}
+
+function print_usage() {
+	echo "Usage: $0 [options]"
+	echo "Options:"
+	echo "  --wsl: Install for WSL"
+	echo "  --hpc: Install HPC tools (Environment Modules, Intel oneAPI)"
+	echo "  --help | -h: Show this help"
+}
+
 while [[ $# -gt 0 ]]; do
 	key="$1"
 	case $key in
-		--wsl)
-			WSL=true
-			shift
-			;;
-		--hpc)
-			HPC=true
-			shift
-			;;
-		--help|-h)
-			echo "Usage: $0 [options]"
-			echo "Options:"
-			echo "  --wsl: Install for WSL"
-			echo "  --hpc: Install HPC tools (Environment Modules, Intel oneAPI)"
-			echo "  --help | -h: Show this help"
-			exit 0
-			;;
-		*)
-			echo "Unknown option: $key"
-			exit 1
-			;;
+	--wsl)
+		WSL=true
+		shift
+		;;
+	--hpc)
+		HPC=true
+		shift
+		;;
+	--help | -h)
+		print_usage
+		exit 0
+		;;
+	*)
+		echo "Unknown option: $key"
+		print_usage
+		exit 1
+		;;
 	esac
 done
 
 # Main process
-PWD=$(cd $(dirname $0); pwd)
+PWD=$(
+	cd "$(dirname "$0")"
+	pwd
+)
 mkdir -p $PWD/checkpoint
 common
 if [ -n "${WSL:-}" ]; then
@@ -174,5 +235,6 @@ fi
 if [ -n "${HPC:-}" ]; then
 	hpc
 fi
+vscode_install_extensions
 
-echo "Finish setup script successfully. Reboot your machine to apply settings." 
+echo "Finish setup script successfully. Reboot your machine to apply settings."
