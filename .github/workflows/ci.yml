@@ -14,6 +14,6 @@ jobs:
     timeout-minutes: 60 # Max execution time (min)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup
         run: ./setup ${{ matrix.options }}
