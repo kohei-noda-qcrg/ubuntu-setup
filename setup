@@ -41,6 +41,7 @@ function common() {
 		export PATH="$VOLTA_HOME/bin:$PATH"
 		volta install node
 	fi
+
 	# neovim
 	sudo apt-get install -y neovim
 	if [ ! -d $PWD/dotfiles ]; then
@@ -87,15 +88,15 @@ function common() {
 
 	# Install fzf
 	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install --all && echo "export FZF_DEFAULT_OPTS='--height 80% --layout=reverse --border'" >>~/.bashrc
+
+	# Install mysql
+	sudo apt-get install -y mysql-server
 }
 
 function wsl() {
 
 	# Add /etc/sudoers entry
 	echo "%docker ALL=(ALL)  NOPASSWD: /usr/sbin/service docker start" | sudo tee -a /etc/sudoers
-
-	# Install mysql
-	sudo apt-get install -y mysql-server
 
 	# Add /etc/sudoers entry
 	echo "%sudo ALL=NOPASSWD: /usr/sbin/service mysql start" | sudo tee -a /etc/sudoers
