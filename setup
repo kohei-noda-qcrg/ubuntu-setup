@@ -20,7 +20,7 @@ function common(){
 		set +e
 		eval "$(pyenv init -)"
 		set -e
-		python3_ver="3.9.15"
+		python3_ver="3.11.4"
 		python2_ver="2.7.18"
 		pyenv install $python3_ver
 		pyenv install $python2_ver
