@@ -2,6 +2,9 @@ name: ubuntu-setup
 
 on:
   push:
+    paths:
+      - "setup"
+      - ".github/workflows/ci.yml"
 
 defaults:
   run:
