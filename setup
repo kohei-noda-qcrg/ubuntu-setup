@@ -139,6 +139,14 @@ function hpc() {
 	sudo /opt/intel/oneapi/modulefiles-setup.sh --force
 }
 
+function print_usage() {
+	echo "Usage: $0 [options]"
+	echo "Options:"
+	echo "  --wsl: Install for WSL"
+	echo "  --hpc: Install HPC tools (Environment Modules, Intel oneAPI)"
+	echo "  --help | -h: Show this help"
+}
+
 while [[ $# -gt 0 ]]; do
 	key="$1"
 	case $key in
@@ -151,15 +159,12 @@ while [[ $# -gt 0 ]]; do
 		shift
 		;;
 	--help | -h)
-		echo "Usage: $0 [options]"
-		echo "Options:"
-		echo "  --wsl: Install for WSL"
-		echo "  --hpc: Install HPC tools (Environment Modules, Intel oneAPI)"
-		echo "  --help | -h: Show this help"
+		print_usage
 		exit 0
 		;;
 	*)
 		echo "Unknown option: $key"
+		print_usage
 		exit 1
 		;;
 	esac
