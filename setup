@@ -16,7 +16,7 @@ function common() {
 	sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 	if [ ! -d ~/.pyenv ]; then
 		git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-		export PATH="$HOME/.pyenv/bin:$HOME/.nodenv/bin:$PATH"
+		export PATH="$HOME/.pyenv/bin:$PATH"
 		set +e
 		eval "$(pyenv init -)"
 		set -e
