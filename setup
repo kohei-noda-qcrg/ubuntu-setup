@@ -112,6 +112,13 @@ function linux() {
 	# mozc
 	sudo apt-get install -y fcitx-mozc
 
+	# Install rust by using rustup
+	if [ ! -d ~/.cargo ]; then
+		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+		echo '. "$HOME/.cargo/env"' >>~/.bashrc
+		source $HOME/.cargo/env
+	fi
+
 	# Install VSCode (https://code.visualstudio.com/docs/setup/linux#_debian-and-ubuntu-based-distributions)
 	sudo apt-get install wget gpg apt-transport-https -y
 	wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >packages.microsoft.gpg
