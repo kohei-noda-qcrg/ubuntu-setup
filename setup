@@ -12,25 +12,25 @@ function common() {
 	# cmake
 	sudo apt-get install -y cmake
 
-	# pyenv
-	sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-	if [ ! -d ~/.pyenv ]; then
-		git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-		export PATH="$HOME/.pyenv/bin:$PATH"
-		set +e
-		eval "$(pyenv init -)"
-		set -e
-		python3_ver="3.11.4"
-		python2_ver="2.7.18"
-		pyenv install $python3_ver
-		pyenv install $python2_ver
-		pyenv global $python3_ver $python2_ver
-		echo 'export PYENV_ROOT="$HOME/.pyenv"' >>~/.bashrc
-		echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >>~/.bashrc
-		echo 'eval "$(pyenv init -)"' >>~/.bashrc
+	# common
+	sudo apt-get install -y make build-essential libssl-dev wget curl llvm
+
+	# Install rust by using rustup
+	if [ ! -d ~/.cargo ]; then
+		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+		echo '. "$HOME/.cargo/env"' >>~/.bashrc
+		source $HOME/.cargo/env
 	fi
-	# pip
-	pip install pytest black flake8 numpy scipy matplotlib pandas jupyterlab
+
+	# uv
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        python3_ver="3.12.5"
+        uv python install "$python3_ver"
+        source $HOME/.cargo/env
+	pkgs=(pytest black flake8 numpy scipy matplotlib pandas jupyterlab)
+        for pkg in "${pkgs[@]}"; do
+                uv tool install "${pkg}"
+        done
 
 	# volta
 	if [ ! -d ~/.volta ]; then
@@ -111,13 +111,6 @@ function wsl() {
 function linux() {
 	# mozc
 	sudo apt-get install -y fcitx-mozc
-
-	# Install rust by using rustup
-	if [ ! -d ~/.cargo ]; then
-		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-		echo '. "$HOME/.cargo/env"' >>~/.bashrc
-		source $HOME/.cargo/env
-	fi
 
 	# Install VSCode (https://code.visualstudio.com/docs/setup/linux#_debian-and-ubuntu-based-distributions)
 	sudo apt-get install wget gpg apt-transport-https -y
