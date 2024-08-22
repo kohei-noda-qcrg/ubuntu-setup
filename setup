@@ -27,10 +27,7 @@ function common() {
         python3_ver="3.12.5"
         uv python install "$python3_ver"
         source $HOME/.cargo/env
-	pkgs=(pytest black flake8 numpy scipy matplotlib pandas jupyterlab)
-        for pkg in "${pkgs[@]}"; do
-                uv pip install --system "${pkg}"
-        done
+	uv pip install pytest black flake8 numpy scipy matplotlib pandas jupyterlab
 
 	# volta
 	if [ ! -d ~/.volta ]; then
