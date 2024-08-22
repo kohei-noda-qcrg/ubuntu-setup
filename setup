@@ -27,7 +27,12 @@ function common() {
         python3_ver="3.12.5"
         uv python install "$python3_ver"
         source $HOME/.cargo/env
-	uv pip install pytest black flake8 numpy scipy matplotlib pandas jupyterlab
+	pkgs=(pytest black flake8 numpy jupyterlab)
+        for pkg in "${pkgs[@]}"; do
+                uv tool install "${pkg}"
+        done
+	uv tool update-shell
+	export PATH="$HOME/.local/bin:$PATH"
 
 	# volta
 	if [ ! -d ~/.volta ]; then
