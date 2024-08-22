@@ -29,7 +29,7 @@ function common() {
         source $HOME/.cargo/env
 	pkgs=(pytest black flake8 numpy scipy matplotlib pandas jupyterlab)
         for pkg in "${pkgs[@]}"; do
-                uv tool install "${pkg}"
+                uv pip install --system "${pkg}"
         done
 
 	# volta
