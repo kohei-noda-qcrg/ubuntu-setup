@@ -21,7 +21,7 @@ jobs:
       - name: Install VSCode
         # In a WSL environment, VSCode is installed on the Windows side, but this repository only considers the Linux part.
         # Therefore, to test the --wsl option, VSCode must be installed manually before running the setup script.
-        if: matrix.options == '--wsl' || matrix.options == '--wsl --hpc'
+        if: contains(matrix.options, '--wsl')
         run: |
           sudo apt-get install wget gpg apt-transport-https -y
           wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >packages.microsoft.gpg
