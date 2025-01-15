@@ -26,14 +26,14 @@ function common() {
 	fi
 
 	# uv
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        python3_ver="3.12.5"
-        uv python install "$python3_ver"
-        source $HOME/.cargo/env
+	curl -LsSf https://astral.sh/uv/install.sh | sh
+	python3_ver="3.12.5"
+	uv python install "$python3_ver"
+	source $HOME/.cargo/env
 	pkgs=(pytest black flake8 numpy jupyterlab)
-        for pkg in "${pkgs[@]}"; do
-                uv tool install "${pkg}"
-        done
+	for pkg in "${pkgs[@]}"; do
+		uv tool install "${pkg}"
+	done
 	uv tool update-shell
 	export PATH="$HOME/.local/bin:$PATH"
 
@@ -49,16 +49,16 @@ function common() {
 
 	# neovim
 	sudo apt-get install -y neovim
-	if [ ! -d $PWD/dotfiles ]; then
-		git clone https://github.com/kohei-noda-qcrg/dotfiles.git $PWD/dotfiles
+	if [ ! -d $SCRIPT_DIR/dotfiles ]; then
+		git clone https://github.com/kohei-noda-qcrg/dotfiles.git $SCRIPT_DIR/dotfiles
 		mkdir -p ~/.config/nvim
-		cp $PWD/dotfiles/nvim/init.vim ~/.config/nvim/init.vim
+		cp $SCRIPT_DIR/dotfiles/nvim/init.vim ~/.config/nvim/init.vim
 	fi
 
 	# git settings
-	if [ ! -f $PWD/checkpoint/git ]; then
+	if [ ! -f $SCRIPT_DIR/checkpoint/git ]; then
 		mkdir -p ~/.config/git
-		cp $PWD/dotfiles/git/* ~/.config/git
+		cp $SCRIPT_DIR/dotfiles/git/* ~/.config/git
 		git config --global init.defaultBranch main
 		git config --global core.editor "nvim"
 		git config --global alias.a add
@@ -71,7 +71,7 @@ function common() {
 		echo 'source "$HOME/.config/git/git-prompt.sh"' >>~/.bashrc
 		echo 'export GIT_PS1_SHOWDIRTYSTATE=1' >>~/.bashrc
 		echo "export PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[01;33m\]\$(__git_ps1)\[\033[01;34m\]\n\$\[\033[00m\] '" >>~/.bashrc
-		touch $PWD/checkpoint/git
+		touch $SCRIPT_DIR/checkpoint/git
 	fi
 
 	# Install docker
@@ -81,7 +81,7 @@ function common() {
 	sudo install -m 0755 -d /etc/apt/keyrings
 	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 	sudo chmod a+r /etc/apt/keyrings/docker.asc
-	
+
 	## Add the repository to Apt sources:
 	echo \
 	  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
@@ -106,10 +106,10 @@ function wsl() {
 	# Add /etc/sudoers entry
 	echo "%sudo ALL=NOPASSWD: /usr/sbin/service mysql start" | sudo tee -a /etc/sudoers
 
-	if [ ! -f $PWD/checkpoint/wsl ]; then
+	if [ ! -f $SCRIPT_DIR/checkpoint/wsl ]; then
 		echo "sudo service docker start" >>$HOME/.bashrc
 		echo "sudo service mysql start" >>$HOME/.bashrc
-		touch $PWD/checkpoint/wsl
+		touch $SCRIPT_DIR/checkpoint/wsl
 	fi
 }
 
@@ -129,12 +129,12 @@ function linux() {
 function hpc() {
 	# Environment Modules
 	sudo apt-get install -y environment-modules
-	if [ ! -f $PWD/checkpoint/hpc ]; then
+	if [ ! -f $SCRIPT_DIR/checkpoint/hpc ]; then
 		echo ". /usr/share/modules/init/bash" >>~/.bashrc
 		echo 'module use "/opt/intel/oneapi/modulefiles"' >>~/.bashrc
-		touch $PWD/checkpoint/hpc
+		touch $SCRIPT_DIR/checkpoint/hpc
 	fi
-	if [ ! -f $PWD/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB ]; then
+	if [ ! -f $SCRIPT_DIR/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB ]; then
 		wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 	fi
 	sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
@@ -219,11 +219,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Main process
-PWD=$(
+SCRIPT_DIR=$(
 	cd "$(dirname "$0")"
 	pwd
 )
-mkdir -p $PWD/checkpoint
+mkdir -p $SCRIPT_DIR/checkpoint
 common
 if [ -n "${WSL:-}" ]; then
 	wsl
