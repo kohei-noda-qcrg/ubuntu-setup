@@ -22,20 +22,18 @@ function common() {
 	if [ ! -d ~/.cargo ]; then
 		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 		echo '. "$HOME/.cargo/env"' >>~/.bashrc
-		source $HOME/.cargo/env
 	fi
+	source $HOME/.cargo/env
 
 	# uv
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 	python3_ver="3.12.5"
-	uv python install "$python3_ver"
-	source $HOME/.cargo/env
+	uv tool update-shell
+	uv python install --default --preview "$python3_ver" # Install $python3_ver Python to ~/.local/bin
 	pkgs=(pytest black flake8 numpy jupyterlab)
 	for pkg in "${pkgs[@]}"; do
 		uv tool install "${pkg}"
 	done
-	uv tool update-shell
-	export PATH="$HOME/.local/bin:$PATH"
 
 	# volta
 	if [ ! -d ~/.volta ]; then
