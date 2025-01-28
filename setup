@@ -118,9 +118,7 @@ function hpc() {
 		echo 'module use "/opt/intel/oneapi/modulefiles"' >>~/.bashrc
 		touch $SCRIPT_DIR/checkpoint/hpc
 	fi
-	if [ ! -f $SCRIPT_DIR/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB ]; then
-		wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-	fi
+	curl -LO https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 	sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 	echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
 	sudo apt-get update
