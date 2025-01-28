@@ -18,12 +18,19 @@ function common() {
 	# c/c++
 	sudo apt install clang clangd clang-format lldb
 
+	# dotfiles
+	dest_dotfiles="$HOME/.config/dotfiles"
+	if [ ! -d "$dest_dotfiles" ]; then
+		git clone https://github.com/kohei-noda-qcrg/dotfiles "$dest_dotfiles"
+	fi
+	GIT_USERNAME=${GIT_USERNAME:-} GIT_EMAIL=${GIT_EMAIL:-} "$dest_dotfiles/pre-setup"
+	"$dest_dotfiles/setup"
+
 	# Install rust by using rustup
 	if [ ! -d ~/.cargo ]; then
 		curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-		echo '. "$HOME/.cargo/env"' >>~/.bashrc
 	fi
-	source $HOME/.cargo/env
+	. $HOME/.cargo/env
 
 	# uv
 	curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -38,41 +45,13 @@ function common() {
 	# volta
 	if [ ! -d ~/.volta ]; then
 		curl https://get.volta.sh | bash
-		echo 'export VOLTA_HOME="$HOME/.volta:$PATH"' >>~/.bashrc
-		echo 'export PATH="$VOLTA_HOME/bin:$PATH"' >>~/.bashrc
-		export VOLTA_HOME="$HOME/.volta"
-		export PATH="$VOLTA_HOME/bin:$PATH"
 		volta install node
 	fi
 
 	# neovim
 	sudo apt-get install -y neovim
-	if [ ! -d $SCRIPT_DIR/dotfiles ]; then
-		git clone https://github.com/kohei-noda-qcrg/dotfiles.git $SCRIPT_DIR/dotfiles
-		mkdir -p ~/.config/nvim
-		cp $SCRIPT_DIR/dotfiles/nvim/init.vim ~/.config/nvim/init.vim
-	fi
 
-	# git settings
-	if [ ! -f $SCRIPT_DIR/checkpoint/git ]; then
-		mkdir -p ~/.config/git
-		cp $SCRIPT_DIR/dotfiles/git/* ~/.config/git
-		git config --global init.defaultBranch main
-		git config --global core.editor "nvim"
-		git config --global alias.a add
-		git config --global alias.br branch
-		git config --global alias.ch checkout
-		git config --global alias.co commit
-		git config --global alias.st status
-		git config --global alias.unstage 'reset HEAD --'
-		git config --global rebase.autostash true
-		echo 'source "$HOME/.config/git/git-prompt.sh"' >>~/.bashrc
-		echo 'export GIT_PS1_SHOWDIRTYSTATE=1' >>~/.bashrc
-		echo "export PS1='\[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[01;33m\]\$(__git_ps1)\[\033[01;34m\]\n\$\[\033[00m\] '" >>~/.bashrc
-		touch $SCRIPT_DIR/checkpoint/git
-	fi
-
-	# Install docker
+	# docker
 	## Add Docker's official GPG key:
 	sudo apt-get update
 	sudo apt-get install ca-certificates curl
@@ -88,7 +67,7 @@ function common() {
 	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 	sudo usermod -aG docker $USER
 
-	# Install GitHub CLI
+	# GitHub CLI
 	(type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
 	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
         && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
@@ -98,23 +77,18 @@ function common() {
 	&& sudo apt update \
 	&& sudo apt install gh -y
 
-	# Install fzf
-	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install --all && echo "export FZF_DEFAULT_OPTS='--height 80% --layout=reverse --border'" >>~/.bashrc
+	# fzf
+	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install --all
 
 	# Install mysql
 	sudo apt-get install -y mysql-server
 }
 
 function wsl() {
-
-	# Add /etc/sudoers entry
-	echo "%docker ALL=(ALL)  NOPASSWD: /usr/sbin/service docker start" | sudo tee -a /etc/sudoers
-
 	# Add /etc/sudoers entry
 	echo "%sudo ALL=NOPASSWD: /usr/sbin/service mysql start" | sudo tee -a /etc/sudoers
 
 	if [ ! -f $SCRIPT_DIR/checkpoint/wsl ]; then
-		echo "sudo service docker start" >>$HOME/.bashrc
 		echo "sudo service mysql start" >>$HOME/.bashrc
 		touch $SCRIPT_DIR/checkpoint/wsl
 	fi
