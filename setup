@@ -25,6 +25,7 @@ function common() {
 	fi
 	GIT_USERNAME=${GIT_USERNAME:-} GIT_EMAIL=${GIT_EMAIL:-} "$dest_dotfiles/pre-setup"
 	"$dest_dotfiles/setup"
+	. "$HOME/.bashrc"
 
 	# Install rust by using rustup
 	if [ ! -d ~/.cargo ]; then
