@@ -87,16 +87,6 @@ function common() {
 	sudo apt-get install -y mysql-server
 }
 
-function wsl() {
-	# Add /etc/sudoers entry
-	echo "%sudo ALL=NOPASSWD: /usr/sbin/service mysql start" | sudo tee -a /etc/sudoers
-
-	if [ ! -f $SCRIPT_DIR/checkpoint/wsl ]; then
-		echo "sudo service mysql start" >>$HOME/.bashrc
-		touch $SCRIPT_DIR/checkpoint/wsl
-	fi
-}
-
 function linux() {
 	# mozc
 	sudo apt-get install -y fcitx-mozc
@@ -201,15 +191,10 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Main process
-SCRIPT_DIR=$(
-	cd "$(dirname "$0")"
-	pwd
-)
+SCRIPT_DIR=$(cd "$(dirname "$0")"; pwd)
 mkdir -p $SCRIPT_DIR/checkpoint
 common
-if [ -n "${WSL:-}" ]; then
-	wsl
-else
+if ! "${WSL:-}"; then
 	linux
 fi
 if [ -n "${HPC:-}" ]; then
