@@ -23,7 +23,7 @@ function common() {
 	if [ ! -d "$dest_dotfiles" ]; then
 		git clone https://github.com/kohei-noda-qcrg/dotfiles "$dest_dotfiles"
 	fi
-	GIT_USERNAME=${GIT_USERNAME:-} GIT_EMAIL=${GIT_EMAIL:-} "$dest_dotfiles/pre-setup"
+	yes | GIT_USERNAME=${GIT_USERNAME:-} GIT_EMAIL=${GIT_EMAIL:-} "$dest_dotfiles/pre-setup"
 	"$dest_dotfiles/setup"
 	. "$HOME/.bashrc"
 
