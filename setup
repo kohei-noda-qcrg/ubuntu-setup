@@ -81,7 +81,10 @@ function common() {
 	&& sudo apt install gh -y
 
 	# fzf
-	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install --all
+	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.local/share/fzf
+	~/.local/share/fzf/install --key-bindings --completion --no-update-rc
+	mkdir -p ~/.config/fzf
+	mv ~/.fzf.bash ~/.config/fzf
 
 	# Install mysql
 	sudo apt-get install -y mysql-server
