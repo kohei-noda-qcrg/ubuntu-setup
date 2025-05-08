@@ -35,7 +35,7 @@ function common() {
 
 	# uv
 	curl -LsSf https://astral.sh/uv/install.sh | sh
-	python3_ver="3.12.5"
+	python3_ver="3.13"
 	uv tool update-shell
 	uv python install --default --preview "$python3_ver" # Install $python3_ver Python to ~/.local/bin
 	pkgs=(pytest black flake8 numpy jupyterlab)
