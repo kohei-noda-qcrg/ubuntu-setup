@@ -18,6 +18,9 @@ function common() {
 	# c/c++
 	sudo apt install clang clangd clang-format lldb
 
+	# use tmp.mount
+	sudo systemctl enable --now /usr/share/systemd/tmp.mount
+
 	# dotfiles
 	dest_dotfiles="$HOME/.config/dotfiles"
 	if [ ! -d "$dest_dotfiles" ]; then
