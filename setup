@@ -13,7 +13,7 @@ function common() {
 	sudo apt-get install -y cmake
 
 	# common
-	sudo apt-get install -y make build-essential libssl-dev wget curl llvm
+	sudo apt-get install -y make build-essential libssl-dev wget curl llvm python3 python3-pip python-is-python3
 
 	# c/c++
 	sudo apt install clang clangd clang-format lldb
@@ -38,13 +38,6 @@ function common() {
 
 	# uv
 	curl -LsSf https://astral.sh/uv/install.sh | sh
-	python3_ver="3.13"
-	uv tool update-shell
-	uv python install --default --preview "$python3_ver" # Install $python3_ver Python to ~/.local/bin
-	pkgs=(pytest black flake8 numpy jupyterlab)
-	for pkg in "${pkgs[@]}"; do
-		uv tool install "${pkg}"
-	done
 
 	# volta
 	if [ ! -d ~/.volta ]; then
