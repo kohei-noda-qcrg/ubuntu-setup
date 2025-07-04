@@ -36,6 +36,9 @@ function common() {
 	fi
 	. $HOME/.cargo/env
 
+	# Install zellij
+	cargo install --locked zellij
+
 	# uv
 	curl -LsSf https://astral.sh/uv/install.sh | sh
 
