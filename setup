@@ -56,7 +56,7 @@ function common() {
         case "$arch" in
             x86_64) archstr="x86_64" ;;
             aarch64) archstr="arm64" ;;
-            *) echo "Unknown Architecture $arch, skip to install neovim..." ;;
+            *) echo "Unsupported Architecture $arch, skip to install neovim..." ;;
         esac
         if [ -n "$archstr" ]; then
             installdir="$HOME/bin"
