@@ -51,7 +51,21 @@ function common() {
 	fi
 
 	# neovim
-	sudo apt-get install -y neovim
+        arch=$(uname -m || echo "Unknown architecture")
+        archstr=""
+        case "$arch" in
+            x86_64) archstr="x86_64" ;;
+            aarch64) archstr="arm64" ;;
+            *) echo "Unknown Architecture $arch, skip to install neovim..." ;;
+        esac
+        if [ -n "$archstr" ]; then
+            installdir="$HOME/bin"
+            appimage="nvim-linux-${archstr}.appimage"
+            curl -LO https://github.com/neovim/neovim/releases/latest/download/$appimage
+            mkdir -p $installdir
+            mv $appimage $installdir/nvim
+            chmod u+x $installdir/nvim
+        fi
 
 	# docker
 	## Add Docker's official GPG key:
